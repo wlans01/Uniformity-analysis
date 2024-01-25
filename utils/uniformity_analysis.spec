@@ -9,7 +9,7 @@ assets_files = [('./assets/*', 'assets')]
 
 a = Analysis(
     ['main.py'],
-    pathex=[nidaqmx],
+    pathex=[],
     binaries=[],
     datas=assets_files,
     hiddenimports=[],
