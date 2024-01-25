@@ -3,5 +3,5 @@ numpy
 matplotlib
 pandas
 requests
-webbrowser
 pyinstaller
+openpyxl
