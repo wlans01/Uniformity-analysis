@@ -1,0 +1,7 @@
+pyqt5
+numpy
+matplotlib
+pandas
+requests
+webbrowser
+pyinstaller

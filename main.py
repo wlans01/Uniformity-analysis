@@ -196,52 +196,7 @@ class MacroGui(QMainWindow):
 
     def start_button_clicked(self):
         ''''''
-        if self.data_path:
-            self.thread = PlotThread(self.data_path[0])
-            self.thread.updata_data_signal.connect(self.update_data)
-            self.thread.start()
-            self.statusBar().showMessage('데이터를 처리중입니다.')
-        else:
-            self.statusBar().showMessage('데이터 경로를 설정해주세요')
-
-    def update_data(self, data):
-        self.no_collimator_left_edit.setText(str(data[0]))
-        self.no_collimator_right_edit.setText(str(data[1]))
-        self.collimator_left_edit.setText(str(data[2]))
-        self.collimator_right_edit.setText(str(data[3]))
-        self.no_collimator_fit_edit_original.setText(str(data[4]))
-        self.collimator_fit_edit_original.setText(str(data[5]))
-        self.no_collimator_fit_edit.setText(str(data[6]))
-        self.collimator_fit_edit.setText(str(data[7]))
-        self.statusBar().showMessage('데이터 처리가 완료되었습니다.')
-        
-
-
-
-
-
-    def closeEvent(self, event):
-        reply =QMessageBox.question(self, 'Message', 'Are you sure to quit?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        
-        if reply == QMessageBox.Yes:
-            
-            event.accept()
-
-        else:
-            event.ignore() 
-
-    
-class PlotThread(QThread):
-    updata_data_signal = pyqtSignal(list)
-
-    def __init__(self, data_path, parent=None):
-        super().__init__(parent)
-        self.data_path = data_path
-
-
-    def run(self):
-        # file 블러오거
-        data = pd.read_excel(self.data_path)
+        data = pd.read_excel(self.data_path[0])
         data = data.to_numpy()
 
         sensor_position = data[:, 0]
@@ -300,7 +255,7 @@ class PlotThread(QThread):
         cv_no_collimator_fit = round(((1- (no_collimator_fit_std / no_collimator_fit_mean)) * 100),2)
         cv_collimator_fit = round(((1-(collimator_fit_std / collimator_fit_mean)) * 100),2)
 
-        self.updata_data_signal.emit([no_collimator_left_uniformity, no_collimator_right_uniformity, collimator_left_uniformity, collimator_right_uniformity, cv_no_collimator, cv_collimator, cv_no_collimator_fit, cv_collimator_fit])
+        self.update_data([no_collimator_left_uniformity, no_collimator_right_uniformity, collimator_left_uniformity, collimator_right_uniformity, cv_no_collimator, cv_collimator, cv_no_collimator_fit, cv_collimator_fit])
 
         # 그래프 그리기
         plt.subplot(1, 3, 1)
@@ -329,9 +284,9 @@ class PlotThread(QThread):
 
         # Plotting the 'no collimator' data
         plt.figure(figsize=(12, 6))
-        plt.plot(data['Sensor position'], data['no collimator'], label='No Collimator', color='blue')
+        plt.plot(sensor_position, no_collimator, label='No Collimator', color='blue')
         plt.axhline(y=no_collimator_mean, color='red', linestyle='--', label=f'Mean: {no_collimator_mean:.2e}')
-        plt.fill_between(data['Sensor position'], no_collimator_mean - no_collimator_std, no_collimator_mean + no_collimator_std, color='grey', alpha=0.5, label=f'Std Dev: {no_collimator_std:.2e}')
+        plt.fill_between(sensor_position, no_collimator_mean - no_collimator_std, no_collimator_mean + no_collimator_std, color='grey', alpha=0.5, label=f'Std Dev: {no_collimator_std:.2e}')
 
         plt.xlabel('Sensor position')
         plt.ylabel('Intensity')
@@ -344,9 +299,9 @@ class PlotThread(QThread):
 
         # Plotting the 'collimator' data
         plt.figure(figsize=(12, 6))
-        plt.plot(data['Sensor position'], data['Collimator'], label='Collimator', color='blue')
+        plt.plot(sensor_position, collimator, label='Collimator', color='blue')
         plt.axhline(y=collimator_mean, color='red', linestyle='--', label=f'Mean: {collimator_mean:.2e}')
-        plt.fill_between(data['Sensor position'], collimator_mean - collimator_std, collimator_mean + collimator_std, color='grey', alpha=0.5, label=f'Std Dev: {collimator_std:.2e}')
+        plt.fill_between(sensor_position, collimator_mean - collimator_std, collimator_mean + collimator_std, color='grey', alpha=0.5, label=f'Std Dev: {collimator_std:.2e}')
 
         plt.xlabel('Sensor position')
         plt.ylabel('Intensity')
@@ -354,8 +309,35 @@ class PlotThread(QThread):
         plt.legend()
         plt.grid(True)
         plt.show()
+            
 
-       
+    def update_data(self, data):
+        self.no_collimator_left_edit.setText(str(data[0]))
+        self.no_collimator_right_edit.setText(str(data[1]))
+        self.collimator_left_edit.setText(str(data[2]))
+        self.collimator_right_edit.setText(str(data[3]))
+        self.no_collimator_fit_edit_original.setText(str(data[4]))
+        self.collimator_fit_edit_original.setText(str(data[5]))
+        self.no_collimator_fit_edit.setText(str(data[6]))
+        self.collimator_fit_edit.setText(str(data[7]))
+        self.statusBar().showMessage('데이터 처리가 완료되었습니다.')
+        
+
+
+
+
+
+    def closeEvent(self, event):
+        reply =QMessageBox.question(self, 'Message', 'Are you sure to quit?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        if reply == QMessageBox.Yes:
+            
+            event.accept()
+
+        else:
+            event.ignore() 
+
+    
 
        
 
@@ -377,8 +359,11 @@ class ExceptionHandler:
         error_msg.exec_()
 
 if __name__ == '__main__':
+    from utils import extract_version
+
     sys.excepthook = ExceptionHandler().handle_exception
     app = QApplication(sys.argv)
     ex = MacroGui()
+    extract_version.update_cheak(ex)
     ex.show()
     sys.exit(app.exec_())
