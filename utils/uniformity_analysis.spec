@@ -8,7 +8,7 @@ assets_files = [('./assets/*', 'assets')]
 
 
 a = Analysis(
-    ['main.py'],
+    ['../main.py'],
     pathex=[],
     binaries=[],
     datas=assets_files,
