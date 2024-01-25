@@ -8,7 +8,7 @@ import main
 # github에 올릴때 버전을 확인하기 위한 코드 + 버전 체크
 def update_cheak(self):
     try:
-        response = requests.get('https://api.github.com/repos/wlans01/LaserMicroscopeController/releases/latest')
+        response = requests.get('https://api.github.com/repos/wlans01/Uniformity-analysis/releases/latest')
         data = response.json()
         latest_version = data['tag_name']
         current_version = main.CURRENT_VERSION

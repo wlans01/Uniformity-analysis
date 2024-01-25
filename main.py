@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # 현재 버전
-CURRENT_VERSION = '1.0.1'
+CURRENT_VERSION = '1.0.2'
 
 # exe 파일을 만들었을때 경로 인식을 위한 함수
 def resource_path(relative_path):
