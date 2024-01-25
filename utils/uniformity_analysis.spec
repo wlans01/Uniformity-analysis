@@ -4,7 +4,7 @@ import sys ; sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 block_cipher = None
 
 
-assets_files = [('./assets/*', 'assets')]
+assets_files = [('../assets/*', 'assets')]
 
 
 a = Analysis(
@@ -44,5 +44,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='.\\assets\\fingerPrint.ico'
+    icon='..\\assets\\fingerPrint.ico'
 )
